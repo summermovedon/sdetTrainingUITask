@@ -1,36 +1,24 @@
 package com.gismatullin.sdettraininguitest.tests;
 
-import static com.gismatullin.sdettraininguitest.testhelper.TestHelper.clean;
-import static com.gismatullin.sdettraininguitest.testhelper.TestHelper.prepareDriver;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.gismatullin.sdettraininguitest.pages.MailBoxPage;
-import com.gismatullin.sdettraininguitest.pages.MainPage;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class MailTest {
-    
-    @BeforeEach
-    public void tearUp() {
-        prepareDriver();
-    }
+public class MailTest extends BaseTest {
 
     @Test
-    public void sendingTestEmail() {
-        MailBoxPage mailBoxPage = MainPage.open().login();
+    @DisplayName("Test of sending email")
+    public void sendEmail() {
+        MailBoxPage mailBoxPage = MailBoxPage.create(driver);
         int currentNumber = mailBoxPage.countTestEmails();
         mailBoxPage.sendEmail(String.format("Найдено %d писем\\ьма", currentNumber));
         int newNumber = mailBoxPage.countTestEmails();
         int actualNumber = newNumber - currentNumber;
-        mailBoxPage.logout();
-        assertEquals(actualNumber, 1);
+        assertEquals(actualNumber, 1, "Wrong number of test emails!");
     }
-
-    @AfterEach
-    public void tearDown() {
-        clean();
-    }
+    
 }

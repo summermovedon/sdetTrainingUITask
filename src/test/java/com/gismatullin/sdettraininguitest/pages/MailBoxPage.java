@@ -1,6 +1,5 @@
 package com.gismatullin.sdettraininguitest.pages;
 
-import static com.gismatullin.sdettraininguitest.testhelper.TestHelper.getDriver;
 import static com.gismatullin.sdettraininguitest.testhelper.TestHelper.loadProperties;
 import static com.gismatullin.sdettraininguitest.testhelper.TestHelper.getLogin;
 import static com.gismatullin.sdettraininguitest.testhelper.TestHelper.getEmailTheme;
@@ -12,6 +11,7 @@ import java.util.Properties;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import static com.gismatullin.sdettraininguitest.testhelper.TestHelper.findElement;
@@ -19,23 +19,76 @@ import static com.gismatullin.sdettraininguitest.testhelper.TestHelper.findEleme
 public class MailBoxPage {
 
     private final static String UI_MAP_PATH = "src/test/resources/uiMaps/mailBoxPageUIMap.properties";
-    private final Properties uiMap = loadProperties(UI_MAP_PATH);
     public static final String SEARCH_QUERY = "папка:Входящие тема:";
+    private final Properties uiMap = loadProperties(UI_MAP_PATH);
+    private WebDriver driver;
 
-    private MailBoxPage() {}
+    private MailBoxPage(WebDriver driver) {
+        this.driver = driver;
+    }
 
-    public static MailBoxPage create() {
-        return new MailBoxPage();
+    public static MailBoxPage create(WebDriver driver) {
+        return new MailBoxPage(driver);
+    }
+
+    private WebElement getComposeButton() {
+        return findElement(driver, uiMap.getProperty("composeButton"));
+    }
+
+    private WebElement getAddressInput() {
+        return findElement(driver, uiMap.getProperty("addressInput"));
+    }
+
+    private WebElement getThemeInput() {
+        return findElement(driver, uiMap.getProperty("themeInput"));
+    }
+
+    private WebElement getMessageBody() {
+        return findElement(driver, uiMap.getProperty("messageBody"));
+    }
+
+    private WebElement getSendButton() {
+        return findElement(driver, uiMap.getProperty("sendButton"));
+    }
+
+    private WebElement getDoneLink() {
+        return findElement(driver, uiMap.getProperty("doneLink"));
+    }
+
+    private WebElement getRefreshButton() {
+        return findElement(driver, uiMap.getProperty("refreshButton"));
+    }
+
+    private WebElement getSearchInput() {
+        return findElement(driver, uiMap.getProperty("searchInput"));
+    }
+
+    private List<WebElement> getListOfEmails(String theme) {
+        String themeXPath = uiMap.getProperty("testEmailTheme").split("%s")[0] + theme + 
+            uiMap.getProperty("testEmailTheme").split("%s")[1];
+        int timeoutBackup = getTimeout();
+        setTimeout(driver, 200); // helps to avoid long waiting in case of absence of test emails
+        List<WebElement> list = driver.findElements(By.xpath(themeXPath));
+        setTimeout(driver, timeoutBackup);
+        return list;
+    }
+
+    private WebElement getUserMenu() {
+        return findElement(driver, uiMap.getProperty("userMenu"));
+    }
+
+    private WebElement getLogoutMenuItem() {
+        return findElement(driver, uiMap.getProperty("logoutMenuItem"));
     }
 
     public void sendEmail(String body) {
-        findElement(uiMap.getProperty("composeButton")).click();
-        findElement(uiMap.getProperty("addressInput")).sendKeys(getLogin());
-        findElement(uiMap.getProperty("themeInput")).sendKeys(getEmailTheme());
-        findElement(uiMap.getProperty("messageBody")).click(); // focus to message body
-        findElement(uiMap.getProperty("messageBody")).sendKeys(body);
-        findElement(uiMap.getProperty("sendButton")).click(); // send email
-        findElement(uiMap.getProperty("doneLink")).click();
+        getComposeButton().click();
+        getAddressInput().sendKeys(getLogin());
+        getThemeInput().sendKeys(getEmailTheme());
+        getMessageBody().click(); // focus to message body
+        getMessageBody().sendKeys(body);
+        getSendButton().click();
+        getDoneLink().click();
     }
 
     public int countTestEmails() {
@@ -44,34 +97,28 @@ public class MailBoxPage {
         refreshMailList();
         clearSearchInput();
         sendSearchQuery(searchQuery);
-        return countEmails(theme);
+        return countEmailsByTheme(theme);
     }
 
     private void refreshMailList() {
-        findElement(uiMap.getProperty("refreshButton")).click();
+        getRefreshButton().click();
     }
     
     private void clearSearchInput() {
-        findElement(uiMap.getProperty("searchInput")).clear();
+        getSearchInput().clear();
     }
 
     private void sendSearchQuery(String query) {
-        findElement(uiMap.getProperty("searchInput")).sendKeys(query + Keys.ENTER);
+        getSearchInput().sendKeys(query + Keys.ENTER);
     }
 
-    private int countEmails(String theme) {
-        String themeXPath = uiMap.getProperty("testEmailTheme").split("%s")[0] + theme + 
-            uiMap.getProperty("testEmailTheme").split("%s")[1];
-        int timeoutBackup = getTimeout();
-        setTimeout(200); // helps to avoid long waiting in case of absence of test emails
-        List<WebElement> list = getDriver().findElements(By.xpath(themeXPath));
-        setTimeout(timeoutBackup);
-        return list.size(); // returns number of found emails
+    private int countEmailsByTheme(String theme) {
+        return getListOfEmails(theme).size();
     }
 
     public void logout() {
-        findElement(uiMap.getProperty("userPic")).click();
-        findElement(uiMap.getProperty("logoutRow")).click();
+        getUserMenu().click();
+        getLogoutMenuItem().click();
     }
     
 }

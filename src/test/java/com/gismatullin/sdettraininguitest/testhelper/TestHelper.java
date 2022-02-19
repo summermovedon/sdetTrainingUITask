@@ -15,7 +15,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 public class TestHelper {
 
-    private static WebDriver driver;
     private static boolean headless = false;
     private static int timeout = 5000;
     private static String login;
@@ -45,30 +44,23 @@ public class TestHelper {
 
     private TestHelper() {}
 
-    public static void prepareDriver() {
+    public static WebDriver prepareDriver() {
         ChromeOptions options = new ChromeOptions();
         if (headless) {
             options.addArguments("--headless");
         }
-        driver = new ChromeDriver(options);
+        WebDriver driver = new ChromeDriver(options);
         driver.manage().timeouts().pageLoadTimeout(Duration.ofMillis(timeout));
-        setTimeout(timeout);
-    }
-
-    public static WebDriver getDriver() {
+        setTimeout(driver, timeout);
         return driver;
-    }
-
-    public static void clean() {
-        driver.quit();
     }
 
     public static int getTimeout() {
         return timeout;
     }
 
-    public static void setTimeout(int newTimeout) {
-        timeout = newTimeout;
+    public static void setTimeout(WebDriver driver, int timeout) {
+        TestHelper.timeout = timeout;
         driver.manage().timeouts().implicitlyWait(Duration.ofMillis(timeout));
     }
 
@@ -95,14 +87,14 @@ public class TestHelper {
         }
     }
 
-    public static WebElement findElement(String locator) {
+    public static WebElement findElement(WebDriver driver, String locator) {
         By by;
         if (locator.startsWith("//")) {
             by =  By.xpath(locator);
         } else {
             by = By.cssSelector(locator);
         }
-        return getDriver().findElement(by);
+        return driver.findElement(by);
     }
 
 }
