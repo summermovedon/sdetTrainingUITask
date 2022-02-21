@@ -16,12 +16,12 @@ public abstract class BaseTest {
     @BeforeAll
     public static void tearUp() {
         driver = prepareDriver();
-        MainPage.open(driver).login();
+        new MainPage(driver).open().login();
     }
 
     @AfterAll
     public static void tearDown() {
-        MailBoxPage.create(driver).logout();
+        new MailBoxPage(driver).logout();
         driver.quit();
     }
     

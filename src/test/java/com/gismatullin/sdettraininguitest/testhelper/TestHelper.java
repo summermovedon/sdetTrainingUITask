@@ -7,9 +7,7 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.util.Properties;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
@@ -85,16 +83,6 @@ public class TestHelper {
             System.err.println(e.getMessage());
             throw new RuntimeException(e);
         }
-    }
-
-    public static WebElement findElement(WebDriver driver, String locator) {
-        By by;
-        if (locator.startsWith("//")) {
-            by =  By.xpath(locator);
-        } else {
-            by = By.cssSelector(locator);
-        }
-        return driver.findElement(by);
     }
 
 }

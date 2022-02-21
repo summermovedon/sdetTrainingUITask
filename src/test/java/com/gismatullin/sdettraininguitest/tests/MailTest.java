@@ -13,7 +13,7 @@ public class MailTest extends BaseTest {
     @Test
     @DisplayName("Test of sending email")
     public void sendEmail() {
-        MailBoxPage mailBoxPage = MailBoxPage.create(driver);
+        MailBoxPage mailBoxPage = new MailBoxPage(driver);
         int currentNumber = mailBoxPage.countTestEmails();
         mailBoxPage.sendEmail(String.format("Найдено %d писем\\ьма", currentNumber));
         int newNumber = mailBoxPage.countTestEmails();
